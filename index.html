@@ -23,15 +23,15 @@
 <body>
 
     <script>
-        // بررسی ثبت‌نام کاربر
+        // Check if the user is registered
         const isRegistered = localStorage.getItem('isRegistered');
 
         if (!isRegistered) {
-            // اگر کاربر ثبت‌نام نکرده باشد، به صفحه login.html هدایت می‌شود
+            // Redirect to login.html if not registered
             window.location.href = 'login.html';
         } else {
-            // اگر کاربر ثبت‌نام کرده باشد، به آدرس shekarcity.io هدایت می‌شود
-            window.location.href = './';
+            // Redirect to the specified URL if registered
+            window.location.href = 'https://github.com/babashakare/minishejar';
         }
     </script>
 
