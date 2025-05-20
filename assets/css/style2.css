@@ -1,0 +1,349 @@
+       /* عمومی */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        a {
+            text-decoration: none;
+        }
+        a:active {
+            color: rgba(241,158,54,1);
+        }
+        html {
+            font-family: sans-serif;
+        }
+        .select-none {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        body {
+            background: radial-gradient(circle, rgba(253,237,201,1) 0%, rgba(241,158,54,1) 15%, rgba(23,23,23,1) 75%);
+            background-repeat: no-repeat;
+            min-height: 100vh;   
+            color: #fff;
+        }
+        /* استایل فرم لاگین */
+        .login-container {
+            width: 320px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 15px;
+            background-color: rgba(33, 33, 33, 0.85);
+            box-shadow: 0 8px 24px rgba(241, 158, 54, 0.6);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .login-container input[type="text"] {
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            border: none;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-container input[type="text"]:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 2px rgba(241, 158, 54, 0.8);
+        }
+
+        .login-container button[type="submit"] {
+            padding: 0.75rem 1rem;
+            background: linear-gradient(83deg, rgba(255,184,95,1) 3%, rgba(241,158,54,1) 28%, rgba(255,142,2,1) 91%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 15px rgba(241, 158, 54, 0.5);
+        }
+
+        .login-container button[type="submit"]:hover {
+            background: linear-gradient(83deg, rgba(255,200,120,1) 3%, rgba(250,175,80,1) 28%, rgba(255,160,60,1) 91%);
+        }
+
+        /* مرکز کردن کانتینر سکه و عکس تپ */
+        .coin-container {
+            position: relative;
+            margin-top: 1.5rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 320px; /* ارتفاع معین برای بهتر نگه داشتن محتوا وسط */
+        }
+
+        /* انیمیشن عدد +1 کنار کلیک */
+        .points-plus {
+            position: absolute;
+            color: #ffba57;
+            font-weight: bold;
+            font-size: 1.5rem;
+            user-select: none;
+            pointer-events: none;
+            animation: moveUpFade 1s forwards;
+            transform: translate(-50%, 0);
+        }
+
+        @keyframes moveUpFade {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50px);
+            }
+        }
+
+        /* استایل‌های بقیه بخش‌ها */
+        .squad-container {
+            margin: 1.75rem auto;
+            width: 80%;
+            height: 4.5rem;
+            border-radius: 15px;
+            background-color: rgba(50, 49, 49, 0.3);
+            border: 2px solid rgb(43, 42, 42, 0.05);
+        }
+        .login {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 1rem;
+        }
+        .login-detail {
+            display: flex;
+            align-items: center;
+        }
+        .profile {
+            width: 3rem;
+            height: 3rem;
+            background-color: rgb(16, 16, 16);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+        }
+        .profile span {
+            font-size: 2rem;
+            color: rgba(151, 151, 151, 0.773);
+        }
+        .user-data {
+            display: flex;
+            flex-direction: column;
+            margin-left: 0.75rem;
+        }
+        .name {
+            color: #ffffff;
+        }
+        .coin-count-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2.25rem;
+        }
+        .rank-container {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+        .rank-items {
+            display: flex;
+            align-items: center;
+            font-size: 1.25rem;
+        }
+        .rank-items h3 {
+            margin-right: 0.5rem;
+        }
+        .rank-items img {
+            margin-left: 0.5rem;
+            margin-right: 0.25rem;
+        }
+        #rank {
+            font-weight: bold;
+        }
+        .coin-count-container img {
+            margin-right: 1rem;
+            width: 50px;
+        }
+        .coin-count-container h1 {
+            color: #ffffff;
+            font-size: 3.5rem;
+        }
+        .menu-container {
+            margin-top: 2.25rem;
+            width: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .power {
+            display: flex;
+            justify-content: center;
+            margin-right: 0.5rem;
+            width: 33%;
+        }
+        .power-count {
+            display: flex;
+            flex-direction: column;
+        }
+        .power-count span {
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .gray {
+            color: #d7d7d798 !important;
+            font-size: 0.75rem !important;
+        }
+        .menu-bottuns {
+            width: 67%;
+            padding: 1rem 0.25rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 5rem;
+            background-color: rgba(218, 218, 218, 0.2);
+            border: 2px solid rgba(218, 218, 218, 0.03);
+            border-radius: 15px;
+            margin-left: 0.5rem;
+            margin-right: -1.25rem;
+        }
+        .button {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 0.25rem;
+            width: 33.3333%;
+        }
+        .button img {
+            margin-top: 0.5rem;
+        }
+        .button span {
+            margin-top: 0.25rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .b-r {
+            border-right: 2px solid rgba(218, 218, 218, 0.1);
+        }
+        .progress-bar {
+            width: 90%;
+            height: 1rem;
+            margin: 1.25rem auto;
+            border-radius: 30px;
+            background-color: rgba(218, 218, 218, 0.5);
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(278deg, rgba(253,237,201,1) 2%, rgba(241,158,54,1) 52%, rgba(185,103,0,1) 88%);
+            border-radius: 30px;
+        }
+        /* انیمیشن shake پیش فرض */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+            75% {
+                transform: translateX(-10px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+        .shake {
+            animation: shake 0.5s ease;
+        }
+		   /* Existing styles */
+    .number {
+        font-size: 28px;
+        font-weight: bold;
+        user-select: text;
+        transition: color 0.3s ease;
+        position: relative;
+        z-index: 10;
+    }
+    .number.red-alert {
+        color: #ff4c4c !important;
+        text-shadow: 0 0 7px #ff0000;
+    }
+
+    /* Additional styles */
+    #rank-timer {
+        margin-top: 5px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #f19e36;
+        text-align: center;
+        font-family: 'Tahoma', sans-serif;
+        user-select: none;
+        display: none;
+    }
+
+    /* points +1 animation */
+    .points-plus {
+        position: absolute;
+        font-size: 24px;
+        font-weight: bold;
+        color: #f19e36;
+        animation: floatUp 1s ease forwards;
+        pointer-events: none;
+        user-select: none;
+        text-shadow: 0 0 3px #f19e36;
+        font-family: 'Tahoma', sans-serif;
+    }
+    @keyframes floatUp {
+        0% {opacity: 1; transform: translateY(0);}
+        100% {opacity: 0; transform: translateY(-40px);}
+    }
+
+    /* shake animation */
+    @keyframes shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+    .shake {
+        animation: shake 0.5s;
+    }

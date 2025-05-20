@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>shekarcoin</title>
+    <link rel="stylesheet" href="./assets/css/style2.css" />
+    <meta name="theme-color" content="#f19e36" />
+    <link rel="icon" type="image/x-icon" href="./assets/favicon/favicon.ico" />
+<meta name="theme-color" content="#f19e36" />
+<link rel="icon" type="image/x-icon" href="./assets/favicon/favicon.ico" />
+</head>
+<body>
+
+<div class="squad-container">
+    <div class="login">
+        <div class="login-detail">
+            <div class="profile">
+                <span>?</span>
+            </div>
+            <div class="user-data">
+                <span class="name">UNKNOWN</span>
+            </div>
+        </div> 
+    </div>
+</div>
+
+<div class="coin-count-container">
+    <img src="./assets/images/coin.png" width="45px" alt="coin"/>
+    <span><div><span id="pointsDisplay" class="number" aria-atomic="true" aria-live="polite">0</span></div></span>
+    <h1 class="select-none"></h1>
+</div>
+
+<div class="rank-container">
+    <div class="rank-items">
+        <h3 class="select-none">حداقل برداشت</h3>
+		<h3 class="select-none">100.000</h3>
+        <img src="./assets/images/bronze-medal.png" class="select-none" width="30px" alt="bronze medal"/>
+        <span id="rank" class="select-none">رنک برنز</span>
+        <div id="rank-timer" aria-live="polite" aria-atomic="true"></div>
+    </div>
+</div>
+
+<div class="login-container" id="loginContainer" style="display: none;">
+    <form id="loginForm">
+        <label for="username">نام کاربری شکرسیتی شما:</label>
+        <input type="text" id="username" required autocomplete="username" />
+        <label for="bagNumber">بج نامبر شکرسیتی شما:</label>
+        <input type="text" id="bagNumber" required autocomplete="off" />
+        <button type="submit">ورود</button>
+    </form>
+</div>
+
+<div class="coin-container" id="coinContainer" style="display: none; position:relative;">
+    <img src="assets/images/shtn.png" id="tapImage" class="select-none" width="300px" alt="tap image" style="cursor:pointer;" />
+</div>
+
+<div class="menu-container">
+    <div class="power">
+        <img src="./assets/images/battery.png" width="40px" alt="power" />
+        <div class="power-count">
+            <span id="chargeDisplay" class="number" aria-atomic="true" aria-live="polite">10000</span>
+            <span class="gray select-none" id="total">/10000</span>
+        </div>
+    </div>
+    <div class="menu-bottuns">
+        <a id="boostWithdrawButton" class="button">
+            <img src="./assets/images/diamond (1).png" alt="" width="28px" />
+            <span class="select-none">برداشت امتیاز</span>
+        </a>
+    </div>
+</div>
+
+<div class="progress-bar">
+    <div class="progress"></div>
+</div>
+
+<script src="./assets/js/jak.js"></script>
+
+</body>
+</html>
+
