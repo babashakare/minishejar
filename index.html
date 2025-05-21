@@ -85,17 +85,19 @@
         e.preventDefault();
     });
 
-    // جلوگیری از نگه داشتن و نمایش لینک ها در موبایل روی تصاویر در همه صفحه
+    // جلوگیری از نگه داشتن و نمایش لینک ها در موبایل روی تصاویر به جز tapImage
     document.querySelectorAll('img').forEach(img => {
-        img.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-        });
-        img.addEventListener('touchend', function(e) {
-            e.preventDefault();
-        });
-        img.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        });
+        if(img.id !== 'tapImage') {
+            img.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+            });
+            img.addEventListener('touchend', function(e) {
+                e.preventDefault();
+            });
+            img.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            });
+        }
     });
 </script>
 
