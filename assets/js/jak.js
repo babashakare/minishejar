@@ -1,7 +1,7 @@
   (function () {
     const maxCharge = 10000;
     const chargeIncrementPerSecond = 0.5;
-    const autoClickThresholdMs = 80;
+    const autoClickThresholdMs = 50;
 
     const pointsDisplay = document.getElementById("pointsDisplay");
     const chargeDisplay = document.getElementById("chargeDisplay");
