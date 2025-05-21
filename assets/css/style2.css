@@ -347,3 +347,120 @@
     .shake {
         animation: shake 0.5s;
     }
+	        /* جلوگیری از انتخاب متن */
+        body, * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-touch-callout: none !important; /* جلوگیری از منوی نگه داشتن در iOS */
+        }
+        /* جلوگیری از کلیک راست */
+        body {
+            cursor: default;
+        }
+        img {
+            -webkit-touch-callout: none; /* جلوگیری از منوی نگه داشتن در iOS */
+            -webkit-user-drag: none; /* جلوگیری از کشیدن تصویر */
+            outline: none; /* حذف کادر انتخاب */
+            user-select: none;
+            /* حذف هایلایت لمسی در موبایل */
+            -webkit-tap-highlight-color: transparent;
+            -webkit-focus-ring-color: transparent;
+            box-shadow: none !important;
+        }
+        img:focus, img:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        #tapImage {
+            outline: none !important;
+            box-shadow: none !important;
+            touch-action: manipulation; /* بهبود لمس بدون منوی زمینه */
+        }
+        #tapImage:focus, #tapImage:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        /* جلوگیری از منوی نگه داشتن در iOS روی لینک ها */
+        a, a img {
+            -webkit-touch-callout: none !important;
+        }
+        a {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            touch-action: manipulation;
+        }
+        a:active, a:focus {
+            outline: none !important;
+            text-decoration: none !important;
+        }
+        /* جلوگیری از باز شدن منوی زمینه و لینک‌ها روی عکس ها */
+        #coinContainer a {
+            pointer-events: none;
+        }
+        /* استایل های پیام */
+        .message {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff6a00, #ee0979);
+            color: white;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(255, 106, 0, 0.6);
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            user-select: none;
+        }
+        .message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .input-container {
+            display: none; /* مخفی به طور پیش‌فرض */
+            margin-top: 10px;
+            max-width: 320px;
+            background: #f48c06;
+            border-radius: 20px;
+            padding: 12px 20px;
+            box-shadow: 0 6px 15px rgba(244, 140, 6, 0.6);
+            font-family: "Vazir", sans-serif;
+            color: white;
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .input-container input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: none;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.4);
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            letter-spacing: 0.2em;
+        }
+        .input-container input::placeholder {
+            color: #ffe6b3;
+        }
+        .input-container input:focus {
+            background: rgba(255,255,255,0.3);
+            box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.7);
+        }
+        /* حذف دکمه فعال‌سازی که دیگر نیاز نیست */
+        .input-container button {
+            display: none !important;
+        }
