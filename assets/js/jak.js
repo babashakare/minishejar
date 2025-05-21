@@ -1,8 +1,7 @@
 (function () {
     const maxCharge = 10000;
     const chargeIncrementPerSecond = 0.5; // 1 charge every 2 seconds
-    const autoClickThresholdMs = 100; // حد سرعت کلیک کمتر از 50 میلی‌ثانیه برای هشدار اتوکلیکر
-    const rankTimerEndKey = (username) => `rankTimerEnd_${username}`; // localStorage key for timer end timestamp
+    const autoClickThresholdMs = 100; // حد سرعت کلیک کمتر از 100 میلی‌ثانیه برای هشدار اتوکلیکر
 
     const pointsDisplay = document.getElementById("pointsDisplay");
     const chargeDisplay = document.getElementById("chargeDisplay");
@@ -11,7 +10,10 @@
     const loginForm = document.getElementById("loginForm");
     const loginContainer = document.getElementById("loginContainer");
     const coinContainer = document.getElementById("coinContainer");
-    const rankTimer = document.getElementById("rank-timer");
+    const notificationMessage = document.getElementById("notificationMessage");
+    const rankElement = document.getElementById("rank");
+    const inputContainer = document.querySelector(".input-container");
+    const specialCodeInput = document.getElementById("specialCode");
 
     // Load saved data for user
     let username = localStorage.getItem("username");
@@ -23,6 +25,7 @@
     function getLastTimeKey(name) { return `lastChargeTimestamp_${name}`; }
     function getPenaltyStartKey(name) { return `penaltyStart_${name}`; }
     function getPatternActivatedKey(name) { return `patternActivated_${name}`; }
+    function getUsedSpecialCodesKey(name) { return `usedSpecialCodes_${name}`; }
 
     // Default values
     let points = 0;
@@ -30,21 +33,16 @@
     let lastTime = Date.now();
     let lastClickTime = 0;
 
-    let tapState = {
-        tapsCount: 0,
-        patternIndex: 0,
-        lastTapTime: 0,
-        pauseTimeout: null,
-        patternCompleted: false,
-        timerInterval: null,
-        rankTimerSeconds: 60,
-        inAlternateState: false,
-        patternUsed: false,
-        rankTimerEndTimestamp: null, // timestamp when timer ends
-    };
+    // State flags
+    let specialActive = false;
+    let specialTimer = null;
+    let inputCloseTimer = null;
 
     const originalImageSrc = "assets/images/shtn.png";
     const alternateImageSrc = "assets/images/shtn2.png";
+
+    // Allowed special codes, can add more here
+    const allowedSpecialCodes = ["SHOK"];
 
     function loadUserData() {
         if (username) {
@@ -52,38 +50,24 @@
             let savedCharge = localStorage.getItem(getChargeKey(username));
             let savedLastTimestamp = localStorage.getItem(getLastTimeKey(username));
             let patternActivated = localStorage.getItem(getPatternActivatedKey(username)) === 'true';
+            let usedCodesStr = localStorage.getItem(getUsedSpecialCodesKey(username));
+            window.usedSpecialCodes = usedCodesStr ? JSON.parse(usedCodesStr) : [];
 
             points = savedPoints !== null ? Number(savedPoints) : 0;
             charge = savedCharge !== null ? Number(savedCharge) : maxCharge;
             lastTime = savedLastTimestamp !== null ? Number(savedLastTimestamp) : Date.now();
-            tapState.patternUsed = patternActivated;
 
-            if (tapState.patternUsed) {
-                tapState.inAlternateState = true;
-                tapImage.src = alternateImageSrc;
-
-                // Load timer end from storage
-                const savedTimerEnd = localStorage.getItem(rankTimerEndKey(username));
-                if (savedTimerEnd) {
-                    const now = Date.now();
-                    const timeLeftMs = Number(savedTimerEnd) - now;
-                    if (timeLeftMs > 0) {
-                        const secondsLeft = Math.ceil(timeLeftMs / 1000);
-                        startRankTimer(secondsLeft);
-                    } else {
-                        // Timer expired
-                        stopRankTimerResetImage();
-                    }
-                } else {
-                    // No saved timer, start fresh 60s timer
-                    startRankTimer(60);
-                }
+            if (patternActivated) {
+                activateSpecialModeUI();
+                specialActive = true;
             }
         } else {
             points = 0;
             charge = maxCharge;
             lastTime = Date.now();
+            window.usedSpecialCodes = [];
         }
+        updateUI();
     }
 
     function saveUserData() {
@@ -91,15 +75,16 @@
             localStorage.setItem(getPointsKey(username), points);
             localStorage.setItem(getChargeKey(username), charge);
             localStorage.setItem(getLastTimeKey(username), lastTime);
+            localStorage.setItem(getPatternActivatedKey(username), specialActive ? 'true' : 'false');
+            localStorage.setItem(getUsedSpecialCodesKey(username), JSON.stringify(window.usedSpecialCodes || []));
             localStorage.setItem("username", username);
             localStorage.setItem("bagNumber", bagNumber);
-            localStorage.setItem(getPatternActivatedKey(username), tapState.patternUsed ? 'true' : 'false');
         }
     }
 
     function updateUI() {
         pointsDisplay.textContent = points.toLocaleString("fa-IR");
-        chargeDisplay.textContent = charge.toLocaleString("fa-IR");
+        chargeDisplay.textContent = Math.floor(charge).toLocaleString("fa-IR");
         document.querySelector(".name").textContent = username || "UNKNOWN";
 
         let penaltyStart = username ? Number(localStorage.getItem(getPenaltyStartKey(username))) : 0;
@@ -122,133 +107,9 @@
         }
     }
 
-    // Start rank timer with optional initial seconds (default 60)
-    function startRankTimer(initialSeconds = 60) {
-        tapState.rankTimerSeconds = initialSeconds;
-        rankTimer.textContent = formatTime(tapState.rankTimerSeconds);
-        rankTimer.style.display = "block";
-
-        if (tapState.timerInterval) {
-            clearInterval(tapState.timerInterval);
-        }
-
-        const endTimestamp = Date.now() + tapState.rankTimerSeconds * 1000;
-        tapState.rankTimerEndTimestamp = endTimestamp;
-        localStorage.setItem(rankTimerEndKey(username), endTimestamp.toString());
-
-        tapState.timerInterval = setInterval(() => {
-            const now = Date.now();
-            const timeLeftMs = tapState.rankTimerEndTimestamp - now;
-            if (timeLeftMs <= 0) {
-                stopRankTimerResetImage();
-            } else {
-                const secondsLeft = Math.ceil(timeLeftMs / 1000);
-                tapState.rankTimerSeconds = secondsLeft;
-                rankTimer.textContent = formatTime(secondsLeft);
-            }
-        }, 500);
-    }
-
-    function formatTime(seconds) {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `00:${s < 10 ? "0" + s : s}`;
-    }
-
-    function stopRankTimerResetImage() {
-        if (tapState.timerInterval) {
-            clearInterval(tapState.timerInterval);
-            tapState.timerInterval = null;
-        }
-        rankTimer.style.display = "none";
-        tapState.inAlternateState = false;
-        tapImage.src = originalImageSrc;
-        tapState.patternCompleted = false;
-        tapState.rankTimerEndTimestamp = null;
-        localStorage.removeItem(rankTimerEndKey(username));
-        resetTapPattern();
-        updateUI();
-    }
-
-    function resetTapPattern() {
-        tapState.tapsCount = 0;
-        tapState.patternIndex = 0;
-        if (tapState.pauseTimeout) {
-            clearTimeout(tapState.pauseTimeout);
-            tapState.pauseTimeout = null;
-        }
-    }
-
-    function handleTapPattern(clickTime) {
-        // If pattern already used, do nothing
-        if (tapState.patternUsed) return;
-
-        if (tapState.patternCompleted) {
-            tapState.inAlternateState = true;
-            return;
-        }
-
-        const maxIntervalBetweenTaps = 600;
-        const requiredPauseDuration = 900;
-
-        switch (tapState.patternIndex) {
-            case 0:
-                if (tapState.tapsCount === 0 || (clickTime - tapState.lastTapTime) <= maxIntervalBetweenTaps) {
-                    tapState.tapsCount++;
-                    if (tapState.tapsCount === 3) {
-                        tapState.patternIndex = 1;
-                        tapState.pauseTimeout = setTimeout(() => {
-                            tapState.patternIndex = 2;
-                            tapState.tapsCount = 0;
-                        }, requiredPauseDuration);
-                    }
-                } else {
-                    resetTapPattern();
-                    tapState.tapsCount = 1;
-                }
-                break;
-            case 1:
-                resetTapPattern();
-                tapState.tapsCount = 1;
-                tapState.patternIndex = 0;
-                break;
-            case 2:
-                if (tapState.tapsCount === 0 || (clickTime - tapState.lastTapTime) <= maxIntervalBetweenTaps) {
-                    tapState.tapsCount++;
-                    if (tapState.tapsCount === 4) {
-                        tapState.patternIndex = 3;
-                        tapState.pauseTimeout = setTimeout(() => {
-                            tapState.patternCompleted = true;
-                            tapState.inAlternateState = true;
-                            tapState.pauseTimeout = null;
-                            tapState.patternUsed = true;
-                            localStorage.setItem(getPatternActivatedKey(username), 'true');
-                            tapImage.src = alternateImageSrc;
-                            startRankTimer();
-                            updateUI();
-                        }, requiredPauseDuration);
-                    }
-                } else {
-                    resetTapPattern();
-                    tapState.tapsCount = 1;
-                    tapState.patternIndex = 0;
-                }
-                break;
-            case 3:
-                resetTapPattern();
-                tapState.tapsCount = 1;
-                tapState.patternIndex = 0;
-                break;
-        }
-
-        tapState.lastTapTime = clickTime;
-    }
-
-    // Adjusted addPoints: always reduces charge by 1 per click
-    // In alternate state adds 5 points, else adds 1 point
     function addPointsOnClick(amountPoints) {
         if (charge > 0) {
-            charge -= 1; // always subtract 1 charge per click
+            charge -= 1;
             points += amountPoints;
             saveUserData();
             updateUI();
@@ -260,93 +121,72 @@
         }
     }
 
+    // On tap image click
     tapImage.addEventListener("click", (event) => {
         if (!username || !bagNumber) {
-            alert("لطفا ابتدا وارد شوید");
+            showNotification("لطفا ابتدا وارد شوید");
             return;
         }
 
         const now = Date.now();
         const timeSinceLastClick = now - lastClickTime;
-
         let penaltyStart = Number(localStorage.getItem(getPenaltyStartKey(username))) || 0;
 
-        if (!tapState.inAlternateState) {
+        if (!specialActive) {
             if (timeSinceLastClick < autoClickThresholdMs) {
                 if (!penaltyStart || now - penaltyStart > 60000) {
-                    alert("سیستم تشخصی اتوکلیکر داد! در صورت استفاده مجدد امتیاز شما صفر میشود");
+                    showNotification("سیستم تشخیص اتوکلیکر داد! در صورت استفاده مجدد امتیاز شما صفر میشود");
                     localStorage.setItem(getPenaltyStartKey(username), now);
                 } else {
                     points = 0;
                     charge = maxCharge;
                     saveUserData();
-                    alert("مجازات شدید! امتیاز شما صفر شد.");
+                    showNotification("مجازات شدید! امتیاز شما صفر شد.");
                     localStorage.removeItem(getPenaltyStartKey(username));
                     updateUI();
                     lastClickTime = now;
                     return;
                 }
             }
-
             lastClickTime = now;
-
             addPointsOnClick(1);
 
-            // نمایش +1 انیمیشنی در محل کلیک
-            const plusOne = document.createElement("span");
-            plusOne.textContent = "+1";
-            plusOne.className = "points-plus";
-
-            const rect = coinContainer.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            plusOne.style.left = `${x}px`;
-            plusOne.style.top = `${y}px`;
-
-            coinContainer.appendChild(plusOne);
-
-            setTimeout(() => {
-                if (plusOne.parentNode) {
-                    plusOne.parentNode.removeChild(plusOne);
-                }
-            }, 1000);
-
-            // Handle tap pattern detection for unlocking alternate image
-            handleTapPattern(now);
+            createFloatingPoints("+1", event);
 
         } else {
-            // Alternate state (pattern used)
             addPointsOnClick(3);
-
-            // نمایش +3 انیمیشنی در محل کلیک
-            const plusFive = document.createElement("span");
-            plusFive.textContent = "+3";
-            plusFive.className = "points-plus";
-
-            const rect = coinContainer.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            plusFive.style.left = `${x}px`;
-            plusFive.style.top = `${y}px`;
-
-            coinContainer.appendChild(plusFive);
-
-            setTimeout(() => {
-                if (plusFive.parentNode) {
-                    plusFive.parentNode.removeChild(plusFive);
-                }
-            }, 1000);
+            createFloatingPoints("+3", event);
         }
     });
 
+    // Create floating + points animation
+    function createFloatingPoints(text, event) {
+        const plus = document.createElement("span");
+        plus.textContent = text;
+        plus.className = "points-plus";
+
+        const rect = coinContainer.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        plus.style.left = `${x}px`;
+        plus.style.top = `${y}px`;
+
+        coinContainer.appendChild(plus);
+
+        setTimeout(() => {
+            if (plus.parentNode) {
+                plus.parentNode.removeChild(plus);
+            }
+        }, 1000);
+    }
+
     boostWithdrawButton.addEventListener("click", () => {
         if (!username || !bagNumber) {
-            alert("لطفا ابتدا وارد شوید");
+            showNotification("لطفا ابتدا وارد شوید");
             return;
         }
-        if (points >= 100) {
+        if (points >= 100000) {
             const formUrl =
                 "https://docs.google.com/forms/d/e/1FAIpQLScSl360FctxiHqMRNgdDKMmdXAPpGwWhA5X8Nex48voaFQd6g/formResponse";
             const formData = new FormData();
@@ -363,14 +203,14 @@
                 points = 0;
                 saveUserData();
                 updateUI();
-                alert("برداشت با موفقیت انجام شد!");
+                showNotification("برداشت با موفقیت انجام شد!");
             })
             .catch((error) => {
-                alert("خطا در ارسال اطلاعات. لطفا دوباره تلاش کنید.");
+                showNotification("خطا در ارسال اطلاعات. لطفا دوباره تلاش کنید.");
                 console.error("Error:", error);
             });
         } else {
-            alert("شما به اندازه کافی امتیاز برای برداشت ندارید.");
+            showNotification("شما به اندازه کافی امتیاز برای برداشت ندارید.");
         }
     });
 
@@ -379,7 +219,7 @@
         username = document.getElementById("username").value.trim();
         bagNumber = document.getElementById("bagNumber").value.trim();
         if (!username || !bagNumber) {
-            alert("لطفاً نام کاربری و شماره کیف پول را وارد کنید.");
+            showNotification("لطفاً نام کاربری و شماره کیف پول را وارد کنید.");
             return;
         }
         loadUserData();
@@ -387,6 +227,92 @@
         loginContainer.style.display = "none";
         coinContainer.style.display = "flex";
         updateUI();
+    });
+
+    // Notification show/hide with animation
+    let notificationTimeout = null;
+    function showNotification(message) {
+        notificationMessage.textContent = message;
+        notificationMessage.classList.add("show");
+        clearTimeout(notificationTimeout);
+        notificationTimeout = setTimeout(() => {
+            notificationMessage.classList.remove("show");
+        }, 8000);
+    }
+
+    // Activate special code mode
+    function activateSpecialModeUI() {
+        tapImage.src = alternateImageSrc;
+        specialActive = true;
+    }
+
+    // Verify special code input instantly on 4 characters
+    specialCodeInput.addEventListener("input", () => {
+        const code = specialCodeInput.value.trim().toUpperCase();
+        
+        if (code.length === 4) {
+            if (!allowedSpecialCodes.includes(code)) {
+                showNotification("کد وارد شده صحیح نیست.");
+                specialCodeInput.value = "";
+                return;
+            }
+
+            if (!username) {
+                showNotification("ابتدا وارد شوید.");
+                specialCodeInput.value = "";
+                return;
+            }
+
+            let usedCodes = window.usedSpecialCodes || [];
+            if (usedCodes.includes(code)) {
+                showNotification("شما قبلاً از این کد استفاده کرده‌اید.");
+                specialCodeInput.value = "";
+                return;
+            }
+
+            // Activate special mode
+            usedCodes.push(code);
+            window.usedSpecialCodes = usedCodes;
+            localStorage.setItem(getUsedSpecialCodesKey(username), JSON.stringify(usedCodes));
+
+            activateSpecialModeUI();
+            saveUserData();
+            specialCodeInput.value = "";
+            showNotification("کد ویژه با موفقیت فعال شد.");
+
+            // Start timer for 15 seconds to disable special mode
+            if (specialTimer) clearTimeout(specialTimer);
+            specialTimer = setTimeout(() => {
+                specialActive = false;
+                tapImage.src = originalImageSrc;
+                showNotification("زمان ویژه به پایان رسید.");
+                saveUserData();
+            }, 15000);
+        }
+        resetInputCloseTimer();
+    });
+
+    // Timer for auto-close input container after 10s inactivity
+    function resetInputCloseTimer() {
+        if (inputCloseTimer) clearTimeout(inputCloseTimer);
+        inputCloseTimer = setTimeout(() => {
+            inputContainer.style.display = "none";
+        }, 10000);
+    }
+
+    // Toggle input-container display when clicking on rank
+    rankElement.addEventListener("click", () => {
+        if (inputContainer.style.display === "none" || inputContainer.style.display === "") {
+            inputContainer.style.display = "block";
+            specialCodeInput.focus();
+            resetInputCloseTimer();
+        } else {
+            inputContainer.style.display = "none";
+            if(inputCloseTimer) {
+                clearTimeout(inputCloseTimer);
+                inputCloseTimer = null;
+            }
+        }
     });
 
     if (username && bagNumber) {
@@ -405,13 +331,14 @@
 
     setInterval(autoRecharge, 2000);
 
-    // جلوگیری از کلیک راست و منوی نگه داشتن روی تمام صفحه
-    document.addEventListener("contextmenu", event => event.preventDefault());
-    document.addEventListener("selectstart", event => event.preventDefault());
-    document.addEventListener("dragstart", event => event.preventDefault());
-    document.addEventListener("touchstart", event => {
-        if (event.target.tagName.toLowerCase() === 'a') {
-            event.preventDefault(); // جلوگیری از منوی نگه داشتن لینک
+    // Prevent right-click and text selection globally
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("selectstart", e => e.preventDefault());
+    document.addEventListener("dragstart", e => e.preventDefault());
+    document.addEventListener("touchstart", e => {
+        if(e.target.tagName.toLowerCase() === 'a') {
+            e.preventDefault();
         }
     });
 })();
+
