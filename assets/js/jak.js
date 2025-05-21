@@ -1,7 +1,7 @@
 (function () {
     const maxCharge = 10000;
     const chargeIncrementPerSecond = 0.5; // 1 charge every 2 seconds
-    const autoClickThresholdMs = 100; // حد سرعت کلیک کمتر از 100 میلی‌ثانیه برای هشدار اتوکلیکر
+    const autoClickThresholdMs = 80; // حد سرعت کلیک کمتر از 100 میلی‌ثانیه برای هشدار اتوکلیکر
 
     const pointsDisplay = document.getElementById("pointsDisplay");
     const chargeDisplay = document.getElementById("chargeDisplay");
