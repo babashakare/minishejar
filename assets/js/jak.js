@@ -291,6 +291,10 @@
         }
         resetInputCloseTimer();
     });
+	tapImage.addEventListener("contextmenu", (event) => {
+    event.preventDefault(); // جلوگیری از نمایش منوی زمینه
+});
+
 
     // Timer for auto-close input container after 10s inactivity
     function resetInputCloseTimer() {
