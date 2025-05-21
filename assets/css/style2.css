@@ -464,3 +464,101 @@
         .input-container button {
             display: none !important;
         }
+		  /* استایل منوی محصولات به صورت پاپ‌آپ */
+  .product-menu {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: linear-gradient(135deg, #ffb347, #ffcc33);
+    border-radius: 20px;
+    box-shadow: 0 8px 15px rgba(255, 135, 44, 0.7);
+    padding: 12px 8px;
+    max-width: 420px;
+    width: 90vw;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    user-select: none;
+    z-index: 1500;
+  }
+  .product-menu.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .product-item {
+    flex: 1 1 20%;
+    background: #fff8e1;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    text-align: center;
+    cursor: pointer;
+    padding: 10px 6px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    outline-offset: 2px;
+  }
+  .product-item:hover,
+  .product-item:focus {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    outline: none;
+  }
+  .product-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 5px;
+    filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.12));
+  }
+  .product-price {
+    font-weight: 700;
+    color: #ff6f00;
+    direction: ltr;
+    font-size: 0.9rem;
+    user-select: text;
+  }
+  .product-item.disabled,
+  .product-item.disabled:hover,
+  .product-item.disabled:focus {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  /* پس‌زمینه تار هنگام فعال بودن منو */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1400;
+  }
+  .overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* ریسپانسیو موبایل */
+  @media (max-width:480px) {
+    .product-menu {
+      gap: 12px;
+      max-width: 95vw;
+      padding: 10px 6px;
+    }
+    .product-item {
+      padding: 8px 4px;
+    }
+    .product-icon {
+      width: 38px;
+      height: 38px;
+    }
+    .product-price {
+      font-size: 0.85rem;
+    }
+  }

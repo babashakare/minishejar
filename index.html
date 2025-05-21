@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>shekarcoin</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>shekarcoin</title>
     <link rel="stylesheet" href="./assets/css/style2.css" />
     <meta name="theme-color" content="#f19e36" />
     <link rel="icon" type="image/x-icon" href="./assets/favicon/favicon.ico" />
@@ -19,7 +19,7 @@
             <div class="user-data">
                 <span class="name">UNKNOWN</span>
             </div>
-        </div> 
+        </div>
     </div>
 </div>
 
@@ -35,7 +35,6 @@
         <h3>100.000</h3>
         <img src="./assets/images/bronze-medal.png" width="30px" alt="bronze medal"/>
         <span id="rank" style="cursor:pointer;">رنک برنز</span>
-        
     </div>
 </div>
 
@@ -48,11 +47,37 @@
         <button type="submit">ورود</button>
     </form>
 </div>
-        <div class="input-container">
-            <input type="text" id="specialCode" maxlength="4" placeholder="کد ویژه را وارد کنید" autocomplete="off" />
-        </div>
+
+<div class="input-container" style="display:none;">
+    <input type="text" id="specialCode" maxlength="4" placeholder="کد ویژه را وارد کنید" autocomplete="off" />
+</div>
+
 <div class="coin-container" id="coinContainer" style="display: none; position:relative;">
     <img src="https://shekarcity.ir/shtn.png" id="tapImage" width="300px" alt="tap image" style="cursor:pointer;" />
+</div>
+
+<!-- پس‌زمینه تار -->
+<div id="overlay" class="overlay" tabindex="-1" aria-hidden="true"></div>
+
+<!-- منوی محصولات - پاپ‌آپ -->
+<div id="productMenu" class="product-menu" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="autoMineBot" data-price="100" title="ربات ماین اتوماتیک">
+        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/1006/1006553.png" alt="ربات ماین اتوماتیک" />
+        <div class="product-price">ربات اتوماینر</div>
+		<div class="product-price">3000</div>
+    </div>
+ <!--   <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product2" data-price="5000000000000" title="محصول دوم">
+        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/1055/1055672.png" alt="محصول دوم" />
+        <div class="product-price">5000</div>
+    </div>
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product3" data-price="8000000000000" title="محصول سوم">
+        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="محصول سوم" />
+        <div class="product-price">8000</div>
+    </div>
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product4" data-price="1000000000000" title="محصول چهارم">
+        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/568/568343.png" alt="محصول چهارم" />
+        <div class="product-price">10000</div> -->
+    </div>
 </div>
 
 <div class="menu-container">
@@ -64,7 +89,11 @@
         </div>
     </div>
     <div class="menu-bottuns">
-        <a id="boostWithdrawButton" class="button">
+        <a class="button b-r" id="earnButton" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="productMenu">
+            <img src="./assets/images/coin.png" alt="" width="28px" />
+            <span class="select-none">فروشگاه</span>
+        </a>
+        <a id="boostWithdrawButton" class="button" role="button">
             <img src="./assets/images/diamond (1).png" alt="" width="28px" />
             <span class="select-none">برداشت</span>
         </a>
@@ -78,28 +107,6 @@
 <div class="message" id="notificationMessage"></div>
 
 <script src="./assets/js/jak.js"></script>
-
-<script>
-    // جلوگیری از نمایش منوی زمینه (بر روی موبایل و دسکتاپ) روی تصویر
-    document.getElementById('tapImage').addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
-
-    // جلوگیری از نگه داشتن و نمایش لینک ها در موبایل روی تصاویر به جز tapImage
-    document.querySelectorAll('img').forEach(img => {
-        if(img.id !== 'tapImage') {
-            img.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-            });
-            img.addEventListener('touchend', function(e) {
-                e.preventDefault();
-            });
-            img.addEventListener('touchmove', function(e) {
-                e.preventDefault();
-            });
-        }
-    });
-</script>
 
 </body>
 </html>
