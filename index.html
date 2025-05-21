@@ -24,6 +24,23 @@
             -webkit-touch-callout: none; /* جلوگیری از منوی نگه داشتن در iOS */
             -webkit-user-drag: none; /* جلوگیری از کشیدن تصویر */
             outline: none; /* حذف کادر انتخاب */
+            user-select: none;
+            /* حذف هایلایت لمسی در موبایل */
+            -webkit-tap-highlight-color: transparent;
+            -webkit-focus-ring-color: transparent;
+            box-shadow: none !important;
+        }
+        img:focus, img:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        #tapImage {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        #tapImage:focus, #tapImage:active {
+            outline: none !important;
+            box-shadow: none !important;
         }
         .message {
             position: fixed;
@@ -87,13 +104,6 @@
         .input-container button {
             display: none !important;
         }
-		img {
-    -webkit-touch-callout: none; /* جلوگیری از منوی نگه داشتن در iOS */
-    -webkit-user-drag: none; /* جلوگیری از کشیدن تصویر */
-    outline: none; /* حذف کادر انتخاب */
-    user-select: none; /* جلوگیری از انتخاب متن */
-}
-
     </style>
 </head>
 <body>
