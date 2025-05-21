@@ -38,8 +38,8 @@
     let specialTimer = null;
     let inputCloseTimer = null;
 
-    const originalImageSrc = "assets/images/shtn.png";
-    const alternateImageSrc = "assets/images/shtn2.png";
+    const originalImageSrc = "shekarcity.ir/shtn.png";
+    const alternateImageSrc = "shekarcity.ir/shtn2.png";
 
     // Allowed special codes, can add more here
     const allowedSpecialCodes = ["SHOK"];
