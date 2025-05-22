@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>shekarcoin</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>shekarcoin</title>
     <link rel="stylesheet" href="./assets/css/style2.css" />
     <meta name="theme-color" content="#f19e36" />
     <link rel="icon" type="image/x-icon" href="./assets/favicon/favicon.ico" />
@@ -17,7 +17,7 @@
                 <span>?</span>
             </div>
             <div class="user-data">
-                <span class="name">UNKNOWN</span>
+                <span class="name">وارد نشده</span>
             </div>
         </div>
     </div>
@@ -31,8 +31,6 @@
 
 <div class="rank-container" aria-live="polite" aria-atomic="true">
     <div class="rank-items">
-        <h3>حداقل برداشت</h3>
-        <h3>100.000</h3>
         <img src="./assets/images/bronze-medal.png" width="30px" alt="bronze medal"/>
         <span id="rank" style="cursor:pointer;">رنک برنز</span>
     </div>
@@ -61,28 +59,35 @@
 
 <!-- منوی محصولات - پاپ‌آپ -->
 <div id="productMenu" class="product-menu" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="autoMineBot" data-price="20000" title="ربات ماین اتوماتیک">
-        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/1006/1006553.png" alt="ربات ماین اتوماتیک" />
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="autoMineBot" data-price="15000" title="ربات ماین اتوماتیک">
+        <img class="product-icon" src="https://shekarcity.ir/image/miner.png" alt="ربات ماین اتوماتیک" />
         <div class="product-price">ربات اتوماینر</div>
-		<div class="product-price">20.000</div>
+        <div class="product-price">15.000</div>
     </div>
- <!--   <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product2" data-price="5000000000000" title="محصول دوم">
-        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/1055/1055672.png" alt="محصول دوم" />
-        <div class="product-price">5000</div>
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product2" data-price="1" title="محصول دوم">
+    <img class="product-icon" src="https://shekarcity.ir/image/vip.png" alt="بخت آزمایی" />
+    <div class="product-price">کارت شانس</div>
+    <div class="product-price">15.000</div>
+</div>
+
+</div>
+
+<div class="chance-box" id="chanceBox" role="dialog" aria-hidden="true">
+    <h2>فقط یکی</h2>
+    <div class="cards-container" role="list" aria-label="کارت‌های بخت آزمایی">
+        <div class="card" aria-label="کارت 1">?</div>
+        <div class="card" aria-label="کارت 2">?</div>
+        <div class="card" aria-label="کارت 3">?</div>
+        <div class="card" aria-label="کارت 4">?</div>
+        <div class="card" aria-label="کارت 5">?</div>
+        <div class="card" aria-label="کارت 6">?</div>
     </div>
-    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product3" data-price="8000000000000" title="محصول سوم">
-        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="محصول سوم" />
-        <div class="product-price">8000</div>
-    </div>
-    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product4" data-price="1000000000000" title="محصول چهارم">
-        <img class="product-icon" src="https://cdn-icons-png.flaticon.com/512/568/568343.png" alt="محصول چهارم" />
-        <div class="product-price">10000</div> -->
-    </div>
+    <button id="closeChanceBox" aria-label="بستن منوی بخت آزمایی">بستن</button>
 </div>
 
 <div class="menu-container">
     <div class="power">
-        <img src="./assets/images/battery.png" width="40px" alt="power" />
+        <img src="https://shekarcity.ir/image/battery.png" width="40px" alt="power" />
         <div class="power-count" aria-live="polite" aria-atomic="true">
             <span id="chargeDisplay" class="number">10000</span>
             <span class="gray" id="total">/10000</span>
@@ -90,11 +95,11 @@
     </div>
     <div class="menu-bottuns">
         <a class="button b-r" id="earnButton" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="productMenu">
-            <img src="./assets/images/coin.png" alt="" width="28px" />
+            <img src="https://shekarcity.ir/image/shop.png" alt="" width="28px" />
             <span class="select-none">فروشگاه</span>
         </a>
         <a id="boostWithdrawButton" class="button" role="button">
-            <img src="./assets/images/diamond (1).png" alt="" width="28px" />
+            <img src="https://shekarcity.ir/shtn.png" alt="" width="28px" />
             <span class="select-none">برداشت</span>
         </a>
     </div>
@@ -110,4 +115,3 @@
 
 </body>
 </html>
-

@@ -562,3 +562,61 @@
       font-size: 0.85rem;
     }
   }
+        /* استایل باکس شانسی */
+        .chance-box {
+            display: none; /* به طور پیش فرض پنهان است */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #0f3460;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(241, 158, 54, 0.8);
+            color: #f7f7f7;
+            width: 350px;
+            max-width: 90vw;
+            padding: 25px 20px 15px 20px;
+            z-index: 1100;
+            user-select: none;
+        }
+        .cards-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            user-select: none;
+        }
+        .card {
+            width: 50px;
+            height: 80px;
+            background-color: #16213e;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(241, 158, 54, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #f7f7f7;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .card.revealed {
+            background: #f19e36;
+            color: #1a1a2e;
+        }
+		#closeChanceBox {
+            margin-top: 18px;
+            background-color: #f19e36;
+            border: none;
+            border-radius: 10px;
+            color: #1a1a2e;
+            font-weight: 700;
+            width: 100%;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+        #closeChanceBox:hover {
+            background-color: #d68027;
+        }
