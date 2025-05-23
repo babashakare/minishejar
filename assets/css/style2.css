@@ -562,61 +562,158 @@
       font-size: 0.85rem;
     }
   }
-        /* استایل باکس شانسی */
-        .chance-box {
-            display: none; /* به طور پیش فرض پنهان است */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #0f3460;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(241, 158, 54, 0.8);
-            color: #f7f7f7;
-            width: 350px;
-            max-width: 90vw;
-            padding: 25px 20px 15px 20px;
-            z-index: 1100;
-            user-select: none;
-        }
-        .cards-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            user-select: none;
-        }
-        .card {
-            width: 50px;
-            height: 80px;
-            background-color: #16213e;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(241, 158, 54, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 26px;
-            font-weight: 700;
-            color: #f7f7f7;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        .card.revealed {
-            background: #f19e36;
-            color: #1a1a2e;
-        }
-		#closeChanceBox {
-            margin-top: 18px;
-            background-color: #f19e36;
-            border: none;
-            border-radius: 10px;
-            color: #1a1a2e;
-            font-weight: 700;
-            width: 100%;
-            padding: 10px 0;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            user-select: none;
-        }
-        #closeChanceBox:hover {
-            background-color: #d68027;
-        }
+  /* جعبه بخت آزمایی - وسط صفحه */
+  .chance-box {
+    background: #222;
+    border-radius: 15px;
+    padding: 25px 20px 40px 20px;
+    width: 400px;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    user-select: none;
+    z-index: 9999;
+    display: none; /* به طور پیش‌فرض مخفی */
+  }
+  /* لوگو */
+  .chance-box .logo,
+  .chance-box .chance-logo {
+    width: 70px;
+    margin: 0 auto 10px auto;
+    display: block;
+  }
+  /* عنوان */
+  .chance-box h2 {
+    margin: 5px 0 20px 0;
+    font-weight: 700;
+    font-size: 2em;
+    color: #f7c600;
+    text-shadow: 0 0 12px #ffd700;
+  }
+  /* کارت‌ها */
+  .cards-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    user-select: none;
+    position: relative;
+  }
+  /* کارت‌ها: ظاهر صندوق */
+  .card {
+    width: 55px;
+    height: 90px;
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow:
+      0 0 6px rgba(255, 215, 0, 0.45),
+      inset 0 3px 15px rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: transparent;
+    transition:
+      color 0.5s ease,
+      box-shadow 0.3s ease,
+      transform 0.25s ease;
+    outline-offset: 3px;
+    background: none;
+    overflow: hidden;
+  }
+  .card:focus-visible {
+    outline: 2px solid #f7c600;
+  }
+  /* بدنه صندوق */
+  .card .body {
+    width: 55px;
+    height: 70px;
+    background-image: url("https://s6.uupload.ir/files/chast1_rcju.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+  /* تصویر روی صندوق */
+  .card .top-image {
+    width: 42px;
+    height: 40px;
+    background-image: url("https://s6.uupload.ir/files/chast2_cgho.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: -1px;
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+  /* متن داخل کارت - عدد امتیاز برای حالت باز شده */
+  .card .reward-text {
+    position: absolute;
+    inset: 0; /* معادل top:0; bottom:0; left:0; right:0; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: transparent;
+    pointer-events: none;
+    user-select: none;
+    transform-origin: center center;
+    transition: color 0.5s ease;
+  }
+  /* کارت باز شده */
+  .card.revealed {
+    color: #f7c600;
+    cursor: default;
+    box-shadow:
+      0 0 15px 3px #ffd700,
+      inset 0 0 12px 2px #fffacd;
+    transform: scale(1.1);
+  }
+  /* امتیاز داخل صندوق برای حالت درخشان */
+  .card.revealed .reward-text {
+    color: #f7c600;
+    font-size: 1.3rem;
+    text-shadow:
+      0 0 8px #ffd700,
+      0 0 12px #ffdd44,
+      0 0 22px #ffc800;
+  }
+  /* محتوای امتیاز در حال حرکت بالارونده داخل صندوق */
+  .reward-points {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #FFD700;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-shadow:
+      0 0 10px #ffd700,
+      0 0 20px #ffe65c,
+      0 0 30px #ffdb40;
+    pointer-events: none;
+    user-select: none;
+  }
+  /* دکمه بستن */
+  #closeChanceBox {
+    margin-top: 20px;
+    background-color: #f7c600;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    color: #222;
+    cursor: pointer;
+    box-shadow: 0 0 10px #f7c60090;
+    transition: background-color 0.25s ease;
+  }
+  #closeChanceBox:hover,
+  #closeChanceBox:focus-visible {
+    background-color: #ffd700;
+    outlin

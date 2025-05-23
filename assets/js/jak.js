@@ -44,13 +44,12 @@
   const originalImageSrc = "https://shekarcity.ir/shtn.png";
   const alternateImageSrc = "https://shekarcity.ir/shtn2.png";
 
-  const allowedSpecialCodes = ["SHOK", "MODA"];
+  const allowedSpecialCodes = ["SHOK","MODA"];
   const autoMineRatePerSecond = 0.5;
 
   // Chance Box elements
   const chanceBox = document.getElementById("chanceBox");
   const cardsContainer = chanceBox.querySelector(".cards-container");
-  const buyChanceButton = document.getElementById("buyChanceButton");
   const closeChanceBoxButton = document.getElementById("closeChanceBox");
 
   // Cards data with weights for probabilities
@@ -62,16 +61,6 @@
     { reward: 15000, weight: 3 },
     { reward: 30000, weight: 3 },
     { reward: 100000, weight: 1 }
-  ];
-
-  // Image URLs for cards (same indexes as cardsWithWeights)
-  const cardImages = [
-    "https://shekarcity.ir/image/122.png",       // image for reward 0 card #1
-    "https://shekarcity.ir/image/122.png",       // image for reward 0 card #2
-    "https://shekarcity.ir/image/122.png",       // image for reward 0 card #3
-    "https://shekarcity.ir/image/122.png",   // image for 20000 reward
-    "https://shekarcity.ir/image/122.png",   // image for 30000 reward
-    "https://shekarcity.ir/image/122.png"   // image for 100000 reward
   ];
 
   // Shuffle array utility
@@ -96,7 +85,7 @@
       }
       randomNum -= cards[i].weight;
     }
-    return {reward: 0, index: 0}; // fallback
+    return {reward: 0, index: 0}; 
   }
 
   function loadUserData() {
@@ -112,37 +101,40 @@
     charge = savedCharge !== null ? Number(savedCharge) : maxCharge;
     lastTime = savedLastTimestamp !== null ? Number(savedLastTimestamp) : Date.now();
 
-    if (patternActivated) {
-      activateSpecialModeUI();
+    // بررسی انقضای حالت ویژه و بارگذاری آن فقط اگر فعال باشد و هنوز منقضی نشده باشد
+    const specialModeExpiration = localStorage.getItem(`specialModeExpiration_${username}`);
+    if (patternActivated && specialModeExpiration && Date.now() < Number(specialModeExpiration)) {
+      activateSpecialModeUI(false);
       specialActive = true;
+    } else {
+      specialActive = false;
+      tapImage.src = originalImageSrc;
+      localStorage.removeItem(`specialModeExpiration_${username}`);
     }
 
-    // Handle offline automining points
+    // بررسی شروع ماین اتوماتیک بعد از ۳ ساعت
     if (localStorage.getItem(getAutoMineStartKey(username))) {
       const autoMineStartTime = Number(localStorage.getItem(getAutoMineStartKey(username)));
-      if (autoMineStartTime > 0) {
-        const now = Date.now();
-        const offlineSeconds = Math.floor((now - autoMineStartTime) / 1000);
-        if (offlineSeconds >= 3600) {
-          let autoMinedPoints = offlineSeconds * autoMineRatePerSecond;
-          let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
-          let newUsedPoints = usedPoints + autoMinedPoints;
-          let pointsToAdd = autoMinedPoints;
+      const now = Date.now();
+      const offlineSeconds = Math.floor((now - autoMineStartTime) / 1000);
+      if (offlineSeconds >= 10800) { // 3 ساعت = 10800 ثانیه
+        let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
+        let pointsToAdd = offlineSeconds * autoMineRatePerSecond;
+        let newUsedPoints = usedPoints + pointsToAdd;
 
-          if (newUsedPoints > maxAutoMinePoints) {
-            pointsToAdd = maxAutoMinePoints - usedPoints;
-            newUsedPoints = maxAutoMinePoints;
-            if(pointsToAdd < 0) pointsToAdd = 0;
-          }
-
-          if(pointsToAdd > 0){
-            addPoints(pointsToAdd);
-            showNotification(`ربات ماین اتوماتیک: ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه شد.`);
-          }
-
-          localStorage.setItem(getAutoMineUsedPointsKey(username), newUsedPoints);
-          localStorage.setItem(getAutoMineStartKey(username), now);
+        if (newUsedPoints > maxAutoMinePoints) {
+          pointsToAdd = maxAutoMinePoints - usedPoints;
+          newUsedPoints = maxAutoMinePoints;
+          if(pointsToAdd < 0) pointsToAdd = 0;
         }
+
+        if(pointsToAdd > 0){
+          addPoints(pointsToAdd);
+          showNotification(`ربات ماین اتوماتیک: ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه شد.`);
+        }
+
+        localStorage.setItem(getAutoMineUsedPointsKey(username), newUsedPoints);
+        localStorage.setItem(getAutoMineStartKey(username), now);
       }
     } else {
       localStorage.setItem(getAutoMineUsedPointsKey(username), 0);
@@ -186,7 +178,7 @@
       product2.setAttribute("aria-disabled", "true");
       product2.setAttribute("aria-pressed", "true");
       product2.style.cursor = "not-allowed";
-      product2.title = "شما در 24 ساعت گذشته این محصول را خریداری کرده‌اید.";
+      product2.title = "شما تا ۲۴ ساعت آینده قادر به خرید این محصول نیستید.";
     } else {
       product2.classList.remove("disabled");
       product2.removeAttribute("aria-disabled");
@@ -377,9 +369,24 @@
     }, 8000);
   }
 
-  function activateSpecialModeUI() {
+  // تغییر تابع activateSpecialModeUI برای ذخیره زمان انقضا در localStorage
+  function activateSpecialModeUI(setTimer = true) {
     tapImage.src = alternateImageSrc;
     specialActive = true;
+    const expirationTime = Date.now() + 15000; // 15 ثانیه
+
+    localStorage.setItem(`specialModeExpiration_${username}`, expirationTime);
+
+    if (setTimer) {
+      if (specialTimer) clearTimeout(specialTimer);
+      specialTimer = setTimeout(() => {
+        specialActive = false;
+        tapImage.src = originalImageSrc;
+        showNotification("زمان ویژه به پایان رسید.");
+        localStorage.removeItem(`specialModeExpiration_${username}`);
+        saveUserData();
+      }, 15000);
+    }
   }
 
   specialCodeInput.addEventListener("input", () => {
@@ -408,24 +415,19 @@
       saveUserData();
       specialCodeInput.value = "";
       showNotification("کد ویژه با موفقیت فعال شد.");
-      if (specialTimer) clearTimeout(specialTimer);
-      specialTimer = setTimeout(() => {
-        specialActive = false;
-        tapImage.src = originalImageSrc;
-        showNotification("زمان ویژه به پایان رسید.");
-        saveUserData();
-      }, 15000);
     }
     resetInputCloseTimer();
   });
 
   tapImage.addEventListener("contextmenu", (event) => event.preventDefault());
+
   function resetInputCloseTimer() {
     if (inputCloseTimer) clearTimeout(inputCloseTimer);
     inputCloseTimer = setTimeout(() => {
       inputContainer.style.display = "none";
     }, 10000);
   }
+
   rankElement.addEventListener("click", () => {
     if (inputContainer.style.display === "none" || inputContainer.style.display === "") {
       inputContainer.style.display = "block";
@@ -442,8 +444,7 @@
 
   let chanceOpened = false; // to allow one card reveal per purchase
 
-  // حذف دکمه خرید بخت آزمایی - خرید مستقیم روی محصول است
-  productMenu.addEventListener("click", (event) => {
+productMenu.addEventListener("click", (event) => {
     const productItem = event.target.closest(".product-item");
     if (!productItem) return;
     if (!username || !bagNumber) {
@@ -451,7 +452,12 @@
       return;
     }
     if (productItem.classList.contains("disabled")) {
-      showNotification("شما قبلا این محصول را خریداری کرده‌اید.");
+      // تغییر پیام فقط برای ربات ماینر
+      if (productItem.dataset.productId === "autoMineBot") {
+        showNotification("شما قبلا این محصول را خریداری کرده‌اید.");
+      } else {
+        showNotification("شما در ۲۴ ساعت آینده قادر به خرید این محصول نیستید.");
+      }
       return;
     }
     const price = Number(productItem.dataset.price);
@@ -463,17 +469,13 @@
     }
 
     if (productId === "product2") {
-      // ثبت زمان خرید
       localStorage.setItem(getChancePurchaseKey(username), Date.now().toString());
-      // کم کردن امتیاز برای خرید
       if (!deductPoints(price)) {
         showNotification("امتیاز کافی برای خرید بخت آزمایی وجود ندارد.");
         return;
       }
-      // بستن منوی فروشگاه
       toggleProductMenu();
-      // نمایش منوی شانس
-      showChanceBox();
+      showChanceBox(); // نمایش کارت‌ها فقط پس از خرید
       showNotification("محصول بخت آزمایی با موفقیت خریداری شد.");
       updateChanceProductState();
     } else if (productId === "autoMineBot") {
@@ -487,41 +489,38 @@
         showNotification("ربات ماین خریداری شد.");
         updateProductMenuState();
       }
-    }
-    else {
+    } else {
       if (deductPoints(price)) {
         showNotification(`محصول ${productId} با موفقیت خریداری شد.`);
       }
     }
-  });
+});
 
+
+  // --- تغییرات بخش کارت شانسی ---
+
+  // نمایش پنجره بخت آزمایی با صندوق‌های درخشان
   function showChanceBox() {
     cardsContainer.innerHTML = '';
+    chanceBox.classList.add("glow-box"); // تابش کل پنجره
     chanceBox.style.display = 'block';
 
-    // Shuffle and create the 6 cards visually
     const cardElements = [];
-    // create shuffled indexes for cardsWithWeights so order is randomized visually
     let indexes = [0,1,2,3,4,5];
     indexes = shuffle(indexes);
 
     for (let i = 0; i < 6; i++) {
       const cardEl = document.createElement('div');
-      cardEl.className = 'card';
+      cardEl.className = 'card glowing-box'; 
       cardEl.tabIndex = 0;
-      cardEl.setAttribute('aria-label', 'کارت بخت آزمایی. کلیک کنید برای باز کردن');
-      // Set background image instead of text
-      // Use cardImages[indexes[i]] as image url
-      cardEl.style.backgroundImage = `url('${cardImages[indexes[i]]}')`;
-      cardEl.style.backgroundSize = 'cover';
-      cardEl.style.backgroundPosition = 'center';
-      cardEl.textContent = ''; // no text shown initially
+      cardEl.setAttribute('aria-label', 'صندوق بخت آزمایی. کلیک کنید برای باز کردن');
+      cardEl.textContent = '?';
+      cardEl.dataset.cardIndex = indexes[i];
+      cardEl.dataset.reward = cardsWithWeights[indexes[i]].reward;
       cardsContainer.appendChild(cardEl);
-      cardEl.dataset.cardIndex = indexes[i]; // store card index to identify reward when revealed
       cardElements.push(cardEl);
     }
 
-    // Attach event listener to cards
     cardElements.forEach(cardEl => {
       cardEl.addEventListener('click', () => revealCard(cardEl, cardElements));
       cardEl.addEventListener('keydown', (e) => {
@@ -535,36 +534,77 @@
     chanceOpened = false;
   }
 
+  // انیمیشن نمایش امتیاز بالارونده از داخل صندوق
+  function animateRewardPoints(cardEl, reward) {
+    const pointsDisplay = document.createElement('span');
+    pointsDisplay.className = 'reward-points';
+    pointsDisplay.textContent = `+${reward.toLocaleString('fa-IR')}`;
+
+    pointsDisplay.style.position = 'absolute';
+    pointsDisplay.style.left = '50%';
+    pointsDisplay.style.top = '50%';
+    pointsDisplay.style.transform = 'translate(-50%, -50%)';
+    pointsDisplay.style.color = '#FFD700';
+    pointsDisplay.style.fontWeight = 'bold';
+    pointsDisplay.style.fontSize = '1.5rem';
+    pointsDisplay.style.textShadow = '0 0 10px #ffd700';
+    pointsDisplay.style.pointerEvents = 'none';
+
+    cardEl.style.position = 'relative';
+    cardEl.appendChild(pointsDisplay);
+
+    pointsDisplay.animate([
+      { transform: 'translate(-50%, -50%)', opacity: 1 },
+      { transform: 'translate(-50%, -120%)', opacity: 0 }
+    ], {
+      duration: 1500,
+      easing: 'ease-out',
+      fill: 'forwards'
+    });
+
+    setTimeout(() => {
+      pointsDisplay.remove();
+    }, 1500);
+  }
+
+  // بازکردن کارت انتخاب‌شده و سپس بازکردن خودکار بقیه کارت‌ها
   function revealCard(cardEl, allCards) {
-    if (chanceOpened) return; // Only one card can be opened
+    if (chanceOpened) return;
     chanceOpened = true;
 
-    // get card index from dataset
-    let idx = parseInt(cardEl.dataset.cardIndex);
-    let reward = cardsWithWeights[idx].reward;
+    const idx = parseInt(cardEl.dataset.cardIndex);
+    const reward = cardsWithWeights[idx].reward;
 
-    // Show the reward amount as text on reveal
-    cardEl.textContent = reward > 0 ? reward.toLocaleString('fa-IR') : '۰';
     cardEl.classList.add('revealed');
+    cardEl.textContent = reward > 0 ? reward.toLocaleString('fa-IR') : '۰';
 
-    if (reward > 0) {
+    if(reward > 0) {
+      animateRewardPoints(cardEl, reward);
       addPoints(reward);
       showNotification(`شما ${reward.toLocaleString('fa-IR')} امتیاز دریافت کردید!`);
     }
 
-    // Disable all cards pointer-events after reveal
-    allCards.forEach(card => card.style.pointerEvents = 'none');
+    allCards.forEach(card => {
+      if(card !== cardEl) {
+        const r = Number(card.dataset.reward);
+        card.classList.add('revealed');
+        card.textContent = r > 0 ? r.toLocaleString('fa-IR') : '۰';
+      }
+      card.style.pointerEvents = 'none';
+    });
 
-    // Close chance box after brief delay
     setTimeout(() => {
       closeChanceBox();
-    }, 1200);
+    }, 3000);
   }
 
   function closeChanceBox() {
     chanceBox.style.display = 'none';
+    chanceBox.classList.remove("glow-box");
     chanceOpened = false;
   }
+
+  // --- پایان تغییرات بخش کارت شانسی ---
 
   function toggleProductMenu() {
     const isVisible = productMenu.classList.contains('show');
@@ -626,5 +666,10 @@
       e.preventDefault();
     }
   });
+
+  closeChanceBoxButton.addEventListener('click', () => {
+    closeChanceBox();
+  });
+
 })();
 

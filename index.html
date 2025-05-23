@@ -59,35 +59,58 @@
 
 <!-- منوی محصولات - پاپ‌آپ -->
 <div id="productMenu" class="product-menu" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="autoMineBot" data-price="20000" title="ربات ماین اتوماتیک">
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="autoMineBot" data-price="15000" title="ربات ماین اتوماتیک">
         <img class="product-icon" src="https://shekarcity.ir/image/miner.png" alt="ربات ماین اتوماتیک" />
         <div class="product-price">ربات اتوماینر</div>
-        <div class="product-price">20.000</div>
+        <div class="product-price">15.000</div>
     </div>
-    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product2" data-price="15000" title="محصول دوم">
-    <img class="product-icon" src="https://shekarcity.ir/image/vip.png" alt="بخت آزمایی" />
-    <div class="product-price">کارت شانس</div>
-    <div class="product-price">15.000</div>
+    <div class="product-item" tabindex="0" role="button" aria-pressed="false" data-product-id="product2" data-price="1" title="محصول دوم">
+        <img class="product-icon" src="https://shekarcity.ir/image/vip.png" alt="بخت آزمایی" />
+        <div class="product-price">کارت شانس</div>
+        <div class="product-price">15.000</div>
+    </div>
 </div>
 
-</div>
-
-<div class="chance-box" id="chanceBox" role="dialog" aria-hidden="true">
-    <h2>فقط یکی</h2>
-    <div class="cards-container" role="list" aria-label="کارت‌های بخت آزمایی">
-        <div class="card" aria-label="کارت 1">?</div>
-        <div class="card" aria-label="کارت 2">?</div>
-        <div class="card" aria-label="کارت 3">?</div>
-        <div class="card" aria-label="کارت 4">?</div>
-        <div class="card" aria-label="کارت 5">?</div>
-        <div class="card" aria-label="کارت 6">?</div>
-    </div>
-    <button id="closeChanceBox" aria-label="بستن منوی بخت آزمایی">بستن</button>
-</div>
+  <div class="chance-box" id="chanceBox" role="dialog" aria-hidden="true" tabindex="-1">
+      <img src="https://shekarcity.ir/shtn.png" alt="لوگو" class="logo" />
+      <h2>فقط یکی</h2>
+      <div class="cards-container" role="list" aria-label="کارت‌های بخت آزمایی">
+          <div class="card" aria-label="کارت 1" data-reward="15000" tabindex="0">
+            <div class="top-image"></div>
+            <div class="body"></div>
+            <div class="reward-text">?</div>
+          </div>
+          <div class="card" aria-label="کارت 2" data-reward="30000" tabindex="0">
+            <div class="top-image"></div>
+            <div class="body"></div>
+            <div class="reward-text">?</div>
+          </div>
+          <div class="card" aria-label="کارت 3" data-reward="0" tabindex="0">
+            <div class="top-image"></div>
+            <div class="body"></div>
+            <div class="reward-text">?</div>
+          </div>
+          <div class="card" aria-label="کارت 4" data-reward="0" tabindex="0">
+            <div class="top-image"></div>
+            <div class="body"></div>
+            <div class="reward-text">?</div>
+          </div>
+          <div class="card" aria-label="کارت 5" data-reward="100000" tabindex="0">
+            <div class="top-image"></div>
+            <div class="body"></div>
+            <div class="reward-text">?</div>
+          </div>
+          <div class="card" aria-label="کارت 6" data-reward="0" tabindex="0">
+            <div class="top-image"></div>
+            <div class="body"></div>
+            <div class="reward-text">?</div>
+          </div>
+      </div>
+  </div>
 
 <div class="menu-container">
     <div class="power">
-        <img src="https://shekarcity.ir/image/battery.png" width="40px" alt="power" />
+        <img src="https://shekarcity.ir/image/battery.png" width="35px" alt="power" />
         <div class="power-count" aria-live="polite" aria-atomic="true">
             <span id="chargeDisplay" class="number">10000</span>
             <span class="gray" id="total">/10000</span>
