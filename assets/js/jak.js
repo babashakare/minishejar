@@ -44,7 +44,7 @@
   const originalImageSrc = "https://shekarcity.ir/shtn.png";
   const alternateImageSrc = "https://shekarcity.ir/shtn2.png";
 
-  const allowedSpecialCodes = ["SHOK", "MODE"];
+  const allowedSpecialCodes = ["SHOK", "MODE", "COOM"];
   const autoMineRatePerSecond = 0.5;
 
   // Chance Box elements
