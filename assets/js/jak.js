@@ -3,11 +3,6 @@
   const chargeIncrementPerSecond = 0.5;
   const autoClickThresholdMs = 80;
   const maxAutoMinePoints = 15000;
-  const autoMineRatePerSecond = 0.5;
-
-  // اضافه تعریف تا 30 دقیقه و 3 ساعت برای ماین اتوماتیک:
-  const autoMineStartDelayMs = 30 * 60 * 1000; // 30 دقیقه
-  const maxAutoMineDurationMs = 3 * 60 * 60 * 1000; // 3 ساعت
 
   const pointsDisplay = document.getElementById("pointsDisplay");
   const chargeDisplay = document.getElementById("chargeDisplay");
@@ -50,11 +45,15 @@
   const alternateImageSrc = "https://shekarcity.ir/shtn2.png";
 
   const allowedSpecialCodes = ["SHOK","MODA"];
+  const autoMineRatePerSecond = 0.5;
 
+  // Chance Box elements
   const chanceBox = document.getElementById("chanceBox");
   const cardsContainer = chanceBox.querySelector(".cards-container");
   const closeChanceBoxButton = document.getElementById("closeChanceBox");
 
+  // Cards data with weights for probabilities
+  // 3 zero cards with higher weight, 2 medium cards, 1 rare high-value card
   const cardsWithWeights = [
     { reward: 0, weight: 4 },
     { reward: 0, weight: 4 },
@@ -64,7 +63,30 @@
     { reward: 100000, weight: 1 }
   ];
 
-  // --- فقط این بخش loadUserData اصلاح شده است ---
+  // Shuffle array utility
+  function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  }
+
+  // Select one reward by weighted random and get index
+  function weightedRandomWithIndex(cards) {
+    const totalWeight = cards.reduce((sum, card) => sum + card.weight, 0);
+    let randomNum = Math.random() * totalWeight;
+    for (let i = 0; i < cards.length; i++) {
+      if (randomNum < cards[i].weight) {
+        return {reward: cards[i].reward, index: i};
+      }
+      randomNum -= cards[i].weight;
+    }
+    return {reward: 0, index: 0}; 
+  }
 
   function loadUserData() {
     if (!username) return;
@@ -79,6 +101,7 @@
     charge = savedCharge !== null ? Number(savedCharge) : maxCharge;
     lastTime = savedLastTimestamp !== null ? Number(savedLastTimestamp) : Date.now();
 
+    // بررسی انقضای حالت ویژه و بارگذاری آن فقط اگر فعال باشد و هنوز منقضی نشده باشد
     const specialModeExpiration = localStorage.getItem(`specialModeExpiration_${username}`);
     if (patternActivated && specialModeExpiration && Date.now() < Number(specialModeExpiration)) {
       activateSpecialModeUI(false);
@@ -89,42 +112,38 @@
       localStorage.removeItem(`specialModeExpiration_${username}`);
     }
 
-    // اصلاح بخش ربات ماین اتوماتیک:
+    // -- تغییر جاوااسکریپت برای ماین اتوماتیک شروع بعد از 30 دقیقه --
+
     if (localStorage.getItem(getAutoMineStartKey(username))) {
       const autoMineStartTime = Number(localStorage.getItem(getAutoMineStartKey(username)));
       const now = Date.now();
-      const offlineDuration = now - autoMineStartTime;
-      const usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
+      const offlineSeconds = Math.floor((now - autoMineStartTime) / 1000);
+      if (offlineSeconds >= 1800) { // تغییر از 10800 (3 ساعت) به 1800 (30 دقیقه)
+        let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
+        let pointsToAdd = offlineSeconds * autoMineRatePerSecond;
+        let newUsedPoints = usedPoints + pointsToAdd;
 
-      if (offlineDuration >= autoMineStartDelayMs && offlineDuration <= maxAutoMineDurationMs) {
-        const offlineSeconds = Math.floor(offlineDuration / 1000);
+        if (newUsedPoints > maxAutoMinePoints) {
+          pointsToAdd = maxAutoMinePoints - usedPoints;
+          newUsedPoints = maxAutoMinePoints;
+          if(pointsToAdd < 0) pointsToAdd = 0;
+        }
 
-        // محاسبه نقاط قابل اضافه بدون تجاوز از حد ماکزیمم
-        const possiblePoints = offlineSeconds * autoMineRatePerSecond;
-        let pointsToAdd = Math.min(possiblePoints, maxAutoMinePoints - usedPoints);
+        // اضافه کردن شرط حداقل ماین 15000
+        if (pointsToAdd < maxAutoMinePoints) {
+          pointsToAdd = maxAutoMinePoints;
+          newUsedPoints = maxAutoMinePoints;
+        }
 
-        if(pointsToAdd > 0) {
+        if(pointsToAdd > 0){
           addPoints(pointsToAdd);
-          showNotification(`ربات ماین اتوماتیک: ${pointsToAdd.toFixed(1)} امتیاز اضافه شد.`);
+          showNotification(`ربات ماین اتوماتیک: ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه شد.`);
         }
 
-        const newUsedPoints = usedPoints + pointsToAdd;
         localStorage.setItem(getAutoMineUsedPointsKey(username), newUsedPoints);
+        localStorage.setItem(getAutoMineStartKey(username), now);
       }
-      else if (offlineDuration > maxAutoMineDurationMs) {
-        // اگر بیشتر از 3 ساعت آفلاین بوده، امتیاز حداکثر اضافه شود اگر هنوز اضافه نشده
-        if(usedPoints < maxAutoMinePoints) {
-          const pointsLeft = maxAutoMinePoints - usedPoints;
-          addPoints(pointsLeft);
-          showNotification(`ربات ماین اتوماتیک: ${pointsLeft.toFixed(1)} امتیاز (حداکثر سه ساعت) اضافه شد.`);
-          localStorage.setItem(getAutoMineUsedPointsKey(username), maxAutoMinePoints);
-        }
-      }
-
-      // بروز رسانی زمان شروع به اکنون برای دفعات بعدی
-      localStorage.setItem(getAutoMineStartKey(username), now);
     } else {
-      // اگر ربات خریداری شده باشد ولی کلید وجود نداشت مقدار اولیه تعیین شود
       localStorage.setItem(getAutoMineUsedPointsKey(username), 0);
     }
 
@@ -132,7 +151,7 @@
     updateProductMenuState();
     updateChanceProductState();
   }
-  
+
   function updateProductMenuState() {
     if (!username) return;
     const autoMineBotKey = getAutoMineStartKey(username);
@@ -339,6 +358,33 @@
       return;
     }
     loadUserData();
+
+    // پس از ورود، مقدار ماین شده را محاسبه و اطلاع دهیم
+    if (localStorage.getItem(getAutoMineStartKey(username))) {
+      const autoMineStartTime = Number(localStorage.getItem(getAutoMineStartKey(username)));
+      const now = Date.now();
+      const offlineSeconds = Math.floor((now - autoMineStartTime) / 1000);
+      let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
+      let pointsToAdd = offlineSeconds * autoMineRatePerSecond;
+      let newUsedPoints = usedPoints + pointsToAdd;
+
+      if (newUsedPoints > maxAutoMinePoints) {
+        pointsToAdd = maxAutoMinePoints - usedPoints;
+        newUsedPoints = maxAutoMinePoints;
+        if(pointsToAdd < 0) pointsToAdd = 0;
+      }
+
+      // حداقل 15000 امتیاز به کاربر داده شود اگر ماین شده
+      if(pointsToAdd >= maxAutoMinePoints && pointsToAdd > 0) {
+        addPoints(pointsToAdd);
+        showNotification(`مدت زمان آفلاین: ربات ماین اتوماتیک ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه کرد.`);
+        localStorage.setItem(getAutoMineUsedPointsKey(username), newUsedPoints);
+        localStorage.setItem(getAutoMineStartKey(username), now);
+      }
+    } else {
+      localStorage.setItem(getAutoMineUsedPointsKey(username), 0);
+    }
+
     saveUserData();
     loginContainer.style.display = "none";
     coinContainer.style.display = "flex";
