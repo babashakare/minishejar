@@ -717,3 +717,12 @@
   #closeChanceBox:focus-visible {
     background-color: #ffd700;
     outlin
+  }
+.walit {
+    font-size: 12px; /* اندازه فونت 12 پیکسل */
+    font-weight: bold; /* بولد */
+    text-align: center; /* وسط چین */
+    width: 50%; /* عرض 50 درصد */
+    margin: 0 auto; /* مرکز چینش */
+    box-sizing: border-box; /* شامل padding و border در اندازه */
+}
