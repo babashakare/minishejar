@@ -112,36 +112,25 @@
       localStorage.removeItem(`specialModeExpiration_${username}`);
     }
 
-    // -- تغییر جاوااسکریپت برای ماین اتوماتیک شروع بعد از 30 دقیقه --
-
+    // --- اصلاح محاسبه ماین اتوماتیک ---
     if (localStorage.getItem(getAutoMineStartKey(username))) {
       const autoMineStartTime = Number(localStorage.getItem(getAutoMineStartKey(username)));
       const now = Date.now();
-      const offlineSeconds = Math.floor((now - autoMineStartTime) / 1000);
-      if (offlineSeconds >= 1800) { // تغییر از 10800 (3 ساعت) به 1800 (30 دقیقه)
-        let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
-        let pointsToAdd = offlineSeconds * autoMineRatePerSecond;
-        let newUsedPoints = usedPoints + pointsToAdd;
-
-        if (newUsedPoints > maxAutoMinePoints) {
-          pointsToAdd = maxAutoMinePoints - usedPoints;
-          newUsedPoints = maxAutoMinePoints;
-          if(pointsToAdd < 0) pointsToAdd = 0;
-        }
-
-        // اضافه کردن شرط حداقل ماین 15000
-        if (pointsToAdd < maxAutoMinePoints) {
-          pointsToAdd = maxAutoMinePoints;
-          newUsedPoints = maxAutoMinePoints;
-        }
-
-        if(pointsToAdd > 0){
+      const offlineMinutes = Math.floor((now - autoMineStartTime) / 60000); // محاسبه دقایق غیبت
+      let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
+      
+      // اگر زمان کمتر از 30 دقیقه است، امتیازی افزوده نشود
+      if (offlineMinutes >= 30) {
+        let effectiveMinutes = offlineMinutes - 30; // فقط دقایقی که از 30 گذشته حساب می‌شود
+        let pointsToAdd = Math.min(effectiveMinutes * 50, maxAutoMinePoints - usedPoints); // 50 امتیاز برای هر دقیقه اضافه میشود، حداکثر 15000
+        if (pointsToAdd > 0) {
           addPoints(pointsToAdd);
           showNotification(`ربات ماین اتوماتیک: ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه شد.`);
+          usedPoints += pointsToAdd;
+          localStorage.setItem(getAutoMineUsedPointsKey(username), usedPoints);
+          // به‌روزرسانی زمان شروع صرفاً به بعد از 30 دقیقه برای درست محاسبه دفعات بعد
+          localStorage.setItem(getAutoMineStartKey(username), now - (offlineMinutes - effectiveMinutes)*60000);
         }
-
-        localStorage.setItem(getAutoMineUsedPointsKey(username), newUsedPoints);
-        localStorage.setItem(getAutoMineStartKey(username), now);
       }
     } else {
       localStorage.setItem(getAutoMineUsedPointsKey(username), 0);
@@ -363,23 +352,19 @@
     if (localStorage.getItem(getAutoMineStartKey(username))) {
       const autoMineStartTime = Number(localStorage.getItem(getAutoMineStartKey(username)));
       const now = Date.now();
-      const offlineSeconds = Math.floor((now - autoMineStartTime) / 1000);
+      const offlineMinutes = Math.floor((now - autoMineStartTime) / 60000);
       let usedPoints = Number(localStorage.getItem(getAutoMineUsedPointsKey(username))) || 0;
-      let pointsToAdd = offlineSeconds * autoMineRatePerSecond;
-      let newUsedPoints = usedPoints + pointsToAdd;
 
-      if (newUsedPoints > maxAutoMinePoints) {
-        pointsToAdd = maxAutoMinePoints - usedPoints;
-        newUsedPoints = maxAutoMinePoints;
-        if(pointsToAdd < 0) pointsToAdd = 0;
-      }
-
-      // حداقل 15000 امتیاز به کاربر داده شود اگر ماین شده
-      if(pointsToAdd >= maxAutoMinePoints && pointsToAdd > 0) {
-        addPoints(pointsToAdd);
-        showNotification(`مدت زمان آفلاین: ربات ماین اتوماتیک ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه کرد.`);
-        localStorage.setItem(getAutoMineUsedPointsKey(username), newUsedPoints);
-        localStorage.setItem(getAutoMineStartKey(username), now);
+      if (offlineMinutes >= 30) {
+        let effectiveMinutes = offlineMinutes - 30;
+        let pointsToAdd = Math.min(effectiveMinutes * 50, maxAutoMinePoints - usedPoints);
+        if (pointsToAdd > 0) {
+          addPoints(pointsToAdd);
+          showNotification(`مدت زمان آفلاین: ربات ماین اتوماتیک ${pointsToAdd.toFixed(1)} امتیاز به شما اضافه کرد.`);
+          usedPoints += pointsToAdd;
+          localStorage.setItem(getAutoMineUsedPointsKey(username), usedPoints);
+          localStorage.setItem(getAutoMineStartKey(username), now - (offlineMinutes - effectiveMinutes)*60000);
+        }
       }
     } else {
       localStorage.setItem(getAutoMineUsedPointsKey(username), 0);
@@ -478,7 +463,7 @@
 
   let chanceOpened = false; // to allow one card reveal per purchase
 
-productMenu.addEventListener("click", (event) => {
+  productMenu.addEventListener("click", (event) => {
     const productItem = event.target.closest(".product-item");
     if (!productItem) return;
     if (!username || !bagNumber) {
@@ -528,8 +513,7 @@ productMenu.addEventListener("click", (event) => {
         showNotification(`محصول ${productId} با موفقیت خریداری شد.`);
       }
     }
-});
-
+  });
 
   // --- تغییرات بخش کارت شانسی ---
 
